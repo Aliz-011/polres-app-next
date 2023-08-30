@@ -13,7 +13,7 @@ const CardInfo: React.FC<CardInfoProps> = ({ title, description, icon }) => {
         <h3 className="font-bold text-gray-700 dark:text-white text-lg">
           {title}
         </h3>
-        <p className="text-gray-400 font-normal text-sm">{description}</p>
+        <p className="text-gray-500 font-medium text-sm">{description}</p>
       </div>
       {/* <Annoyed /> */}
     </div>

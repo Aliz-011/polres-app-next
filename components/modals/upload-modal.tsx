@@ -74,7 +74,6 @@ const UploadModal = () => {
       if (!docRef.id) throw Error('Data gagal dibuat');
       toast({
         title: `Data telah ditambahkan`,
-        description: 'Silahkan refresh halaman untuk melihat data terbaru.',
       });
       onClose();
       form.reset({
@@ -88,9 +87,20 @@ const UploadModal = () => {
     } catch (error) {
       toast({
         title: error as string,
-        description: 'Silahkan refresh halaman untuk melihat data terbaru.',
       });
     }
+  };
+
+  const closeForm = () => {
+    onClose();
+    form.reset({
+      notaDinas: '',
+      dari: '',
+      kepada: '',
+      keterangan: '',
+      perihal: '',
+      date: new Date(),
+    });
   };
 
   return (
@@ -232,7 +242,7 @@ const UploadModal = () => {
             />
 
             <div className="pt-6 space-x-2 flex items-center justify-end">
-              <Button variant="ghost" onClick={onClose} type="button">
+              <Button variant="ghost" onClick={closeForm} type="button">
                 Cancel
               </Button>
               <Button type="submit">Simpan</Button>

@@ -1,7 +1,7 @@
 // app/layout.tsx
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs';
+import { ClerkProvider, ClerkLoading, ClerkLoaded } from '@clerk/nextjs';
 
 // components
 import { ModalProvider } from '@/providers/modal-provider';
@@ -23,10 +23,23 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+        <head>
+          <link
+            rel="icon"
+            href="/polres_logo.jpeg"
+            type="image/jpg"
+            sizes="any"
+          />
+        </head>
         <body className={inter.className}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <ModalProvider />
-            {children}
+            <ClerkLoading>
+              <div className="flex items-center justify-center">
+                <p className="mt-28">Tunggu sebentar...</p>
+              </div>
+            </ClerkLoading>
+            <ClerkLoaded>{children}</ClerkLoaded>
             <Toaster />
           </ThemeProvider>
         </body>

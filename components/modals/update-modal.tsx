@@ -7,11 +7,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { format } from 'date-fns';
 import { updateDoc, doc, serverTimestamp } from 'firebase/firestore';
-
-// custom hooks
-import { useUpdateModal } from '@/hooks/use-update-modal';
-import { cn } from '@/lib/utils';
 import db from '@/firebase';
+
+// hooks
+import { useUpdateModal } from '@/hooks/use-update-modal';
+import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { toast } from '@/hooks/use-toast';
 
 // components
 import { Modal } from '../ui/modal';
@@ -33,7 +35,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   notaDinas: z.string().min(5),
@@ -46,12 +47,14 @@ const formSchema = z.object({
   }),
 });
 
-const UpdateModal = () => {
-  const { isOpen, onClose, id } = useUpdateModal();
+type NotaDetails = {
+  id: string;
+  values: Record<string, any>;
+};
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
+const UpdateModal = () => {
+  const [nota, setNota] = useState<NotaDetails>();
+  const { isOpen, onClose, id: notaId, data } = useUpdateModal();
 
   const onChange = (open: boolean) => {
     if (!open) {
@@ -59,10 +62,14 @@ const UpdateModal = () => {
     }
   };
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+
   // update data to database
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const docRef = doc(db, 'notaris', id);
+      const docRef = doc(db, 'notaris', notaId);
       await updateDoc(docRef, {
         values,
         updatedAt: serverTimestamp(),
@@ -72,17 +79,39 @@ const UpdateModal = () => {
 
       toast({
         title: `Data berhasil diubah`,
-        description: 'Silahkan refresh halaman untuk melihat data terbaru.',
       });
 
       onClose();
     } catch (error) {
       toast({
         title: error as string,
-        description: 'Silahkan refresh halaman.',
       });
     }
   };
+
+  // close the form and reset the form fields
+  const closeForm = () => {
+    onClose();
+    form.reset({
+      notaDinas: '',
+      dari: '',
+      kepada: '',
+      keterangan: '',
+      perihal: '',
+      date: new Date(),
+    });
+  };
+
+  useEffect(() => {
+    if (data) {
+      form.reset({
+        dari: data.dari,
+        kepada: data.kepada,
+        notaDinas: data.notaDinas,
+        perihal: data.perihal,
+      });
+    }
+  }, [data]);
 
   return (
     <Modal title="Edit data" description="" isOpen={isOpen} onChange={onChange}>
@@ -218,7 +247,7 @@ const UpdateModal = () => {
             />
 
             <div className="pt-6 space-x-2 flex items-center justify-end">
-              <Button variant="ghost" onClick={onClose} type="button">
+              <Button variant="ghost" onClick={closeForm} type="button">
                 Cancel
               </Button>
               <Button type="submit">Simpan</Button>

@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Nota, NotaColumn, columns } from './columns';
 
 // firebase
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 import db from '@/firebase';
 
 const HomeClient = () => {
@@ -23,46 +23,67 @@ const HomeClient = () => {
     dari: item.values.dari,
     kepada: item.values.kepada,
     notaDinas: item.values.notaDinas,
+    perihal: item.values.perihal,
   }));
 
   useEffect(() => {
     const getData = async () => {
       const q = query(collection(db, 'notaris'));
-      const querySnapshot = await getDocs(q);
-      const arr: Nota[] = [];
-      querySnapshot.forEach((doc) =>
-        arr.push({ id: doc.id, ...doc.data() } as Nota)
-      );
-      setData(arr);
+      let arr: Nota[] = [];
+      const unsubscribe = onSnapshot(q, (qurySnapshot) => {
+        qurySnapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            arr.push({ id: change.doc.id, ...change.doc.data() } as Nota);
+          }
+          if (change.type === 'modified') {
+            arr.push({ id: change.doc.id, ...change.doc.data() } as Nota);
+          }
+          if (change.type === 'removed') {
+            arr.push({ id: change.doc.id, ...change.doc.data() } as Nota);
+          }
+        });
+        setData(arr);
+      });
+
+      return () => {
+        unsubscribe();
+      };
     };
     getData();
-  }, []);
+  }, [data]);
   return (
-    <div className="max-h-screen h-screen">
-      <Navbar />
-      <div className="max-w-5xl mx-auto">
-        <div className="space-y-4 pt-6">
-          <HomeHeading data={data} />
-        </div>
-
-        <Separator />
-
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mt-4">
-          {/* card for info */}
-          <CardInfo title="Nota tersimpan" description={data.length} />
-          <CardInfo title="Products Sold" description="957000" />
-
-          {/* table etx */}
-          <div className="col-span-4 shadow-md dark:border p-4 rounded-xl">
-            <DataTable
-              searchKey="notaDinas"
-              columns={columns}
-              data={formattedNota}
-            />
+    <div className="relative">
+      <img
+        src="/polres_logo.jpeg"
+        className="absolute inset-0 w-full h-full object-contain backdrop-blur-md"
+        alt="Logo Background"
+      />
+      <div className="max-h-screen h-screen relative z-10 bg-white dark:bg-inherit bg-opacity-90 rounded-lg backdrop-blur-sm">
+        <Navbar />
+        <div className="max-w-5xl mx-auto relative">
+          <div className="space-y-4 pt-6">
+            <HomeHeading data={data} />
           </div>
 
-          <div className="col-span-2 shadow-md dark:border p-4 rounded-xl">
-            <RecentActivity />
+          <Separator />
+
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mt-4 h-full">
+            {/* card for info */}
+            <CardInfo title="Nota tersimpan" description={data.length} />
+            <CardInfo title="Products Sold" description="957000" />
+
+            {/* table etx */}
+            <div className="col-span-4 shadow-md dark:border p-4 rounded-xl h-full">
+              <DataTable
+                searchKey="notaDinas"
+                columns={columns}
+                data={formattedNota}
+              />
+            </div>
+
+            <div className="col-span-2 shadow-md dark:border p-4 rounded-xl">
+              <RecentActivity />
+            </div>
           </div>
         </div>
       </div>

@@ -14,6 +14,7 @@ export type NotaColumn = {
   dari: string;
   kepada: string;
   notaDinas: string;
+  perihal: string;
 };
 
 export const columns: ColumnDef<NotaColumn>[] = [

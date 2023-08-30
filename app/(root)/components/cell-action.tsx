@@ -23,9 +23,10 @@ import { useUpdateModal } from '@/hooks/use-update-modal';
 
 const CellAction = ({ data }: { data: NotaColumn }) => {
   const router = useRouter();
-  const { onOpen, setId } = useUpdateModal();
+  const { onOpen, setId, setData } = useUpdateModal();
 
   const deleteData = async (id: string) => {
+    confirm('Apakah yakin ingin menghapus data?');
     try {
       await deleteDoc(doc(db, `notaris`, id));
       toast({
@@ -64,12 +65,13 @@ const CellAction = ({ data }: { data: NotaColumn }) => {
           onClick={() => {
             onOpen();
             setId(data.id);
+            setData(data);
           }}
         >
           <Edit className="h-4 w-4 mr-2" />
           Edit data
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push(`/details/${data.id}`)}>
+        <DropdownMenuItem onClick={() => router.push(`/${data.id}`)}>
           <EyeIcon className="h-4 w-4 mr-2" />
           Details
         </DropdownMenuItem>
