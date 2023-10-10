@@ -6,11 +6,11 @@ import { useEffect, useState } from 'react';
 // components
 import HomeHeading from './home-heading';
 import CardInfo from './card-info';
-import { DataTable } from './data-table';
 import RecentActivity from './recent-activity';
+import { DataTable } from './data-table';
+import { Nota, NotaColumn, columns } from './columns';
 import Navbar from '@/components/navbar';
 import { Separator } from '@/components/ui/separator';
-import { Nota, NotaColumn, columns } from './columns';
 
 // firebase
 import { collection, onSnapshot, query } from 'firebase/firestore';
@@ -70,7 +70,7 @@ const HomeClient = () => {
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mt-4 h-full">
             {/* card for info */}
             <CardInfo title="Nota tersimpan" description={data.length} />
-            <CardInfo title="Products Sold" description="957000" />
+            {/* <CardInfo title="Products Sold" description="957000" /> */}
 
             {/* table etx */}
             <div className="col-span-4 shadow-md dark:border p-4 rounded-xl h-full">

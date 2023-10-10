@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+
 import { Copy, Edit, EyeIcon, Trash } from 'lucide-react';
 import { NotaColumn } from './columns';
 
@@ -26,13 +27,10 @@ const CellAction = ({ data }: { data: NotaColumn }) => {
   const { onOpen, setId, setData } = useUpdateModal();
 
   const deleteData = async (id: string) => {
-    confirm('Apakah yakin ingin menghapus data?');
     try {
       await deleteDoc(doc(db, `notaris`, id));
       toast({
         title: `Data telah dihapus`,
-        description:
-          'Silahkan refresh halaman untuk melihat data telah terhapus.',
       });
     } catch (error) {
       console.log(error);
